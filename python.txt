@@ -1,0 +1,266 @@
+pract3.py
+import os
+import sys
+
+
+def count_occurence(file, search):
+    try:
+        with open(file, 'r', errors='ignore', encoding='utf-8') as f:
+            content = f.read()
+            return content.count(search)
+    except Exception as e:
+        print(f'Error reading file {file}: {e}')
+        return 0
+
+
+
+
+def search_directory(d, search):
+    for root, _, files in os.walk(d):
+        for file in files:
+            file_path = os.path.join(root, file)
+            count = count_occurence(file_path, search)
+            if count > 0:
+                print(f'Found {search} in {file_path} {count} times')  
+
+
+def main():
+    if len(sys.argv) != 3:
+        print('Usage: python pract3.py <directory> <search>')
+        sys.exit(1)
+
+
+    directory_path = sys.argv[1]
+    search_text = sys.argv[2]
+
+
+    if not os.path.isdir(directory_path):
+        print(f'{directory_path} is not a valid directory')
+        sys.exit(1)
+   
+    search_directory(directory_path, search_text)
+    print(f'Searching for {search_text} in {directory_path}')
+
+
+if __name__ == '__main__':
+    main()
+
+
+pract4.py
+from functools import reduce
+
+
+number = [1,2,3 ,4,5]
+name = ['a', 'b', 'c', 'd', 'e']
+
+
+square = list(map(lambda x: x**2, number))
+print(square)
+
+
+filter_number = list(filter(lambda x: x%2 != 0, number))
+print(filter_number)
+
+
+add_number = reduce(lambda x, y: x + y, number)
+print(add_number)
+
+
+Pract5.java
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
+public class pract5 {
+
+    // LocalDate difference(LocalDate date1, LocalDate date2) {
+    //     return getDaysBetween(date1, date2);
+    // }
+
+    public static void main(String[] args){
+        LocalDate date = LocalDate.now();
+        System.out.println("Current date: " + date);
+
+        LocalDate date1 = LocalDate.of(2024, 2, 10);
+       // difference(date, LocalDate.of(2024, 2, 10));
+        System.out.println("Days between " + date + " and " + LocalDate.of(2024, 2, 10) + " = " );
+        System.out.println(getDaysBetween(date, date1) + " days");
+    // });
+    }
+
+    public static long getDaysBetween(LocalDate start, LocalDate end) {
+        return ChronoUnit.DAYS.between(start, end);
+    }
+}
+
+
+
+pract6.py
+dict1 =  {'Input.txt': 'Albert', 'Code.py': 'Stanley', 'Output.txt': 'Albert',
+          'Btech.txt' : 'Albert'}
+
+
+dict2 = {}
+for key, value in dict1.items():
+    dict2.setdefault(value, []).append(key)
+print(dict2)
+
+
+
+
+pract7.py
+n = 7
+for i in range(1, n):
+    print(" " * (n-i) + "*"*(2*i-1))
+
+
+
+
+for i in range(n, 0, -1):
+    print(" " * (n-i) + "*"*(2*i-1))
+
+
+print()
+for i in range(0, n):
+    if i==0 or i == n-1:
+        print("*"*n)
+    else:
+        print("*" +" " * (n-2) + "*")
+
+
+pract8.py
+import math
+
+
+def quadratic(a, b, c):
+    d = b**2 - 4*a*c
+    if(d<0):
+        print("Imaginary roots")
+    else:
+        quad1 = (-b + math.sqrt(d))/(2*a)
+        quad2 = (-b - math.sqrt(d))/(2*a)
+        print(f"Roots are {quad1} and {quad2}")
+
+
+quadratic(2, -5, -3)
+
+
+pract9.py
+class Animal:
+    def sound(self):
+        return "Some generic sound"
+
+
+class Dog(Animal):  # Inheritance
+    def sound(self):  # Method Overriding
+        return "Bark"
+
+
+class Cat(Animal):  # Inheritance
+    def sound(self):  # Method Overriding
+        return "Meow"
+
+
+class Calculator:
+    def add(self, a, b, c=0):  # Single method with optional parameter
+        return a + b + c
+
+
+# Testing Inheritance and Overriding
+animals: list[Animal] = [Dog(), Cat(), Animal()]
+for animal in animals:
+    print(f"{animal._class.name_} sound: {animal.sound()}")
+
+
+# Testing Overloading
+calc = Calculator()
+print("Addition of two numbers (5 + 3):", calc.add(5, 3))
+print("Addition of three numbers (5 + 3 + 2):", calc.add(5, 3, 2))
+
+
+pract10.py
+import time
+import sqlite3
+import threading
+
+
+db_name = 'pract10.db'
+
+
+def create_table():
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute('''
+                Create table if not exists users(
+                id integer primary key autoincrement,
+                name varchar(20), age integer)
+        ''')
+    conn.commit()
+    cursor.close()
+    print('Table created successfully')
+
+
+def insert_data(name, age):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("Insert into users(name, age) values(?, ?)", (name, age))
+    conn.commit()
+    cursor.close()
+    print('Data inserted successfully')
+
+
+def fetch_data():
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute('''Select * from users''')
+    rows = cursor.fetchall()
+    for row in rows:
+        print(row)
+    cursor.close()
+    conn.commit()
+    print('Data fetched successfully')
+
+
+def update_data():
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute('''Update users set name = 'Albert' where id = 1''')
+    cursor.close()
+    conn.commit()
+    print('Data updated successfully')
+
+
+def insert_user_thread():
+    users = [('Albert', 20), ('Stanley', 22), ('John', 23), ('Doe', 24)]
+    threads = []
+    for user in users:
+        thread = threading.Thread(target=insert_data, args=user)
+        threads.append(thread)
+        thread.start()
+
+
+    for thread in threads:
+        thread.join()
+
+
+def select_user_thread():
+    threads = []
+    thread = threading.Thread(target=fetch_data)
+    threads.append(thread)
+    thread.start()
+    thread.join()
+
+
+if __name__ == '__main__':
+    create_table()
+
+
+    print('Inserting data into the database')
+    insert_user_thread()
+
+
+    print('Fetching data from the database')
+    select_user_thread()
+
+
+
