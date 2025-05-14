@@ -1,0 +1,1041 @@
+JVP LAB 1 
+1 Overview: 
+This document provides a detailed explanation of the Java program for a notification service. The program allows the creation, storage, and retrieval of notifications using the following components: 
+• NotificationVO: A value object representing a notification. 
+• NotificationDAO: An interface defining methods for managing notifications. • NotificationService: A service class for notification operations. 
+• MapNotificationDAO: An implementation of the NotificationDAO interface. 
+2 Code: 
+2.1 NotificationVO Class 
+The NotificationVO class represents a notification with a timestamp and a message. 
+import java.util.Date; 
+public class NotificationVO { 
+private final Date notificationDate; 
+private final String notificationMessage; 
+public NotificationVO(Date var1, String var2) { 
+this.notificationDate = var1; 
+this.notificationMessage = var2; 
+} 
+public Date getNotificationDate() { 
+return this.notificationDate; 
+} 
+public String getNotificationMessage() { 
+return this.notificationMessage; 
+} 
+} 
+1
+2.2 NotificationDAO Interface 
+The NotificationDAO interface defines the methods for adding and retrieving notifications. 
+import java.util.Date; 
+import java.util.UUID; 
+public interface NotificationDAO { 
+UUID addNotification(Date var1, String var2); 
+NotificationVO getNotification(UUID var1); 
+} 
+2.3 MapNotificationDAO Class 
+import java.util.Date; 
+import java.util.HashMap; 
+import java.util.Map; 
+import java.util.UUID; 
+public class MapNotificationDAO implements NotificationDAO { private final Map<UUID, NotificationVO> notifications = new HashMap(); 
+public MapNotificationDAO() { 
+} 
+public UUID addNotification(Date var1, String var2) { 
+UUID var3 = UUID.randomUUID(); 
+this.notifications.put(var3, new NotificationVO(var1, var2)); return var3; 
+} 
+public NotificationVO getNotification(UUID var1) { 
+return (NotificationVO)this.notifications.get(var1); 
+} 
+} 
+2.4 NotificationService 
+import java.io.PrintStream; 
+import java.util.ArrayList; 
+import java.util.Date; 
+import java.util.Iterator; 
+import java.util.Scanner; 
+import java.util.UUID;
+public class NotificationService { 
+private final NotificationDAO storage; 
+public NotificationService(NotificationDAO var1) { 
+this.storage = var1; 
+} 
+public UUID raiseNotification(String var1) { 
+return this.storage.addNotification(new Date(), var1); 
+} 
+public Date getNotificationTime(UUID var1) { 
+NotificationVO var2 = this.storage.getNotification(var1); 
+return var2 != null ? var2.getNotificationDate() : null; 
+} 
+public String getNotificationMessage(UUID var1) { 
+NotificationVO var2 = this.storage.getNotification(var1); 
+return var2 != null ? var2.getNotificationMessage() : null; 
+} 
+public static void main(String[] var0) { 
+if (var0.length < 1) { 
+System.out.println("Please provide the count of alerts as the first argument."); } else { 
+int var1; 
+try { 
+var1 = Integer.parseInt(var0[0]); 
+} catch (NumberFormatException var9) { 
+System.out.println("Invalid alert count. Please provide a valid number."); return; 
+} 
+Scanner var2 = new Scanner(System.in); 
+MapNotificationDAO var3 = new MapNotificationDAO(); 
+NotificationService var4 = new NotificationService(var3); 
+ArrayList var5 = new ArrayList(); 
+System.out.println("Enter " + var1 + " notification messages:"); 
+for(int var6 = 0; var6 < var1; ++var6) { 
+String var7 = var2.nextLine(); 
+UUID var8 = var4.raiseNotification(var7); 
+var5.add(var8); 
+} 
+System.out.println("Stored notifications:");
+Iterator var10 = var5.iterator(); 
+while(var10.hasNext()) { 
+UUID var11 = (UUID)var10.next(); 
+PrintStream var10000 = System.out; 
+String var10001 = String.valueOf(var11); 
+var10000.println("ID: " + var10001 + ", 
+Time: " + 
+String.valueOf(var4.getNotificationTime(var11)) + " 
+, Message: " + 
+var4.getNotificationMessage(var11)); 
+} 
+var2.close(); 
+} 
+} 
+} 
+3 Output:
+
+JVP Lab 2 
+1 Java Code 
+1 public class UserInputBuilder { 
+2 public static class TextInputBuilder { 
+3 StringBuilder output = new StringBuilder () ; 4 
+5 public void add ( char c ) { 
+6 output . append (c); 
+7 } 
+8 
+9 public String getValue () { 
+10 return output . toString () ; 
+11 } 
+12 } 
+13 
+14 public static class NumericInputBuilder extends TextInputBuilder { 
+15 @Override 
+16 public void add ( char c ) { 
+17 if ( Character . isDigit (c) ) { 
+18 output . append (c) ; 
+19 } 
+20 } 
+21 } 
+22 
+23 public static class OddNumericInputBuilder extends NumericInputBuilder { 
+24 @Override 
+25 public void add ( char c ) { 
+26 int value = c - ’0’; 
+27 if ( Character . isDigit (c) && value % 2 != 0) { 28 output . append (c) ; 
+29 } 
+30 } 
+31 } 
+32 
+33 public static class EvenNumericInputBuilder extends NumericInputBuilder { 
+34 @Override 
+35 public void add ( char c ) { 
+36 int value = c - ’0’; 
+37 if ( Character . isDigit (c) && value % 2 == 0) { 38 output . append (c) ; 
+39 } 
+40 } 
+1
+41 } 
+42 
+43 public static void main ( String [] args ) { 
+44 TextInputBuilder input = new NumericInputBuilder () ; 45 input . add (’1’) ; 
+46 input . add (’a’) ; 
+47 input . add (’0’) ; 
+48 System . out . println (" Numeric Input Builder : " + input . getValue () ); 
+49 
+50 OddNumericInputBuilder odd = new OddNumericInputBuilder () ; 51 odd . add (’1’); 
+52 odd . add (’2’); 
+53 odd . add (’3’); 
+54 System . out . println (" Odd Numeric : " + odd . getValue () ); 55 
+56 EvenNumericInputBuilder even = new EvenNumericInputBuilder () ; 
+57 even . add (’2’); 
+58 even . add (’0’); 
+59 even . add (’8’); 
+60 System . out . println (" Even Numeric : " + even . getValue () ); 61 } 
+62 } 
+Listing 1: UserInputBuilder Class 
+2 Program Output 
+The output of the above program is as follows: 
+Numeric Input Builder: 10 
+Odd Numeric: 13 
+Even Numeric: 208 
+Figure 1: Screenshot of Program Output
+JVP Lab 3 
+1 Introduction 
+This experiment demonstrates concurrent file searching in Java using the ExecutorService framework. The program searches for a given text inside text-based files within a specified directory using multithreading. 
+2 Java Code 
+The following Java program searches for a given text in all .txt, .log, .csv, and .pdf files within a directory using a thread pool. 
+Listing 1: Concurrent File Search in Java 
+1 import java . io .*; 
+2 import java . util . concurrent .*; 
+3 import java . nio . charset . StandardCharsets ; 
+4 
+5 public class ConcurrentFileSearch { 
+6 private static final int THREAD_POOL_SIZE = 10; 7 public static void main ( String [] args ) { 
+8 if ( args . length != 2) { 
+9 System . out . println (" Usage :␣ Require ␣2␣ arguments ,␣ path ␣ for␣ directory ␣and ␣ file ␣ name ␣to␣ search ") ; 
+10 return ; 
+11 } 
+12 
+13 String directoryPath = args [0]; 
+14 String textSearch = args [1]. trim () ; 
+15 
+16 File dir = new File ( directoryPath ) ; 
+17 if (! dir . exists () || ! dir . isDirectory () ) { 18 System . out . println (" Directory ␣ doesn ’t␣ exist ") ; 19 return ; 
+20 } 
+21 
+1
+22 ExecutorService executor = Executors . 
+newFixedThreadPool ( THREAD_POOL_SIZE ) ; 
+23 searchFiles ( dir , textSearch , executor ) ; 24 executor . shutdown () ; 
+25 } 
+26 
+27 private static void searchFiles ( File directory , String textSearch , ExecutorService executor ) { 
+28 File [] files = directory . listFiles () ; 
+29 if ( files == null ) return ; 
+30 
+31 for ( File f : files ) { 
+32 if ( f . isDirectory () ) { 
+33 searchFiles (f , textSearch , executor ) ; 34 } else { 
+35 executor . submit (new FileSearchTask (f , textSearch ) ) ; 
+36 } 
+37 } 
+38 } 
+39 
+40 static class FileSearchTask implements Callable < Void > { 41 private final File file ; 
+42 private final String textSearch ; 
+43 
+44 public FileSearchTask ( File file , String textSearch ) { 45 this . file = file ; 
+46 this . textSearch = textSearch ; 
+47 } 
+48 
+49 @Override 
+50 public Void call () { 
+51 int count = countOccurrence ( file , textSearch ) ; 52 if ( count > 0) { 
+53 System . out . println (" File :␣" + file . getAbsolutePath () + "␣|␣ Count :␣" + count ) ; 
+54 } 
+55 return null ; 
+56 } 
+57 
+58 private int countOccurrence ( File file , String textSearch ) { 
+59 int count = 0; 
+60 if (! isTextFile ( file ) ) return 0; 
+61 
+62 System . out . println (" Processing ␣ file :␣" + file . getName () ) ; 
+63 
+64 try ( BufferedReader reader = new BufferedReader (
+new InputStreamReader (new FileInputStream ( file 
+) , StandardCharsets . UTF_8 ) ) ) { 
+65 String line ; 
+66 while (( line = reader . readLine () ) != null ) { 67 count += ( line . toLowerCase () . split ( textSearch . toLowerCase () , -1) . length - 
+1) ; 
+68 } 
+69 } catch ( IOException e ) { 
+70 System . err . println (" Error ␣ reading ␣ file :␣" + file . getAbsolutePath () ) ; 
+71 } 
+72 return count ; 
+73 } 
+74 
+75 private boolean isTextFile ( File file ) { 76 return file . getName () . endsWith (".txt ") || file . getName () . endsWith (".log ") || file . getName () . 
+endsWith (".csv") || file . getName () . endsWith (". 
+pdf") ; 
+77 } 
+78 } 
+79 } 
+3 Output 
+The expected output of the program is as follows: 
+Figure 1: Example Output Screenshot
+JVP Lab 4 
+1 Introduction 
+This document provides a demonstration of various Java features, including Lambda expressions, Optional, and Stream operations such as Filter, Map, and Reduce. These functional programming concepts help make Java code more concise and expressive. 
+2 Java Code Demonstration 
+Below is a complete Java program that demonstrates the use of Lambda expressions, Optional, and Stream operations: 
+import java.util.Arrays; 
+import java.util.List; 
+import java.util.Optional; 
+import java.util.stream.Collectors; 
+public class StreamExample { 
+public static void main(String[] args) { 
+List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10); 
+// Lambda Expressions: Printing elements 
+System.out.println("Lambda Expressions:"); 
+numbers.forEach(n -> System.out.print(n + " ")); 
+System.out.println("\n"); 
+// Stream Filter: Extract even numbers 
+System.out.println("Stream Filter (Even Numbers):"); 
+List<Integer> evenNumbers = numbers.stream() 
+.filter(n -> n % 2 == 0) 
+.collect(Collectors.toList()); 
+System.out.println(evenNumbers + "\n"); 
+// Stream Map: Square each number 
+System.out.println("Stream Map (Squared Numbers):"); 
+List<Integer> squaredNumbers = numbers.stream() 
+.map(n -> n * n) 
+.collect(Collectors.toList()); 
+System.out.println(squaredNumbers + "\n"); 
+// Stream Reduce: Compute the sum of numbers 
+System.out.println("Stream Reduce (Sum of Numbers):"); 
+int sum = numbers.stream() 
+.reduce(0, Integer::sum); 
+System.out.println(sum + "\n"); 
+// Optional: Find the maximum number 
+System.out.println("Optional (Max Number):"); 
+Optional<Integer> maxNumber = numbers.stream().max(Integer::compareTo); 
+maxNumber.ifPresent(System.out::println); 
+} 
+}
+
+
+
+1
+3 Execution Output 
+Below is an image of the output when the above program is executed:
+
+JVP Lab 5 
+1 Aim 
+Design the program to demonstrate the difference between LocalDate and LocalDateTime. Create a function that returns the difference in days between two dates. 
+2 Code 
+2.1 Java Implementation 
+import java.time.LocalDate; 
+import java.time.LocalDateTime; 
+import java.time.temporal.ChronoUnit; 
+public class DateDifferenceDemo { 
+public static long getDaysDifference(LocalDate date1, LocalDate date2) { return ChronoUnit.DAYS.between(date1, date2); 
+} 
+public static void main(String[] args) { 
+LocalDate localDate1 = LocalDate.of(2024, 2, 10); 
+LocalDate localDate2 = LocalDate.of(2024, 2, 20); 
+LocalDateTime localDateTime1 = LocalDateTime.of(2024, 2, 10, 10, 30); LocalDateTime localDateTime2 = LocalDateTime.of(2024, 2, 20, 15, 45); 
+long differenceInDays = getDaysDifference(localDate1, localDate2); System.out.println("Difference in days (LocalDate): " + differenceInDays); 
+long differenceInDaysTime =getDaysDifference 
+1
+(localDateTime1.toLocalDate(), localDateTime2.toLocalDate()); System.out.println("Difference in days 
+(LocalDateTime, ignoring time): " 
++ differenceInDaysTime); 
+} 
+} 
+3 Output
+
+
+Java and Python Lab 6 
+Tanya Singh 
+242011055 
+1 March 2025 
+NAME:TANYA SINGH 
+ROLLNO:242011055 
+Use Python Programming language Implement a groupAndSortOwners function that: Accepts a dictionary containing the file owner name for each file name. Returns a dictionary containing a list of file names for each owner name (i.e. grouped by owner name), in alphabetical order of file names. For example, for dictionary {‘Input.txt’: ‘Albert’, ‘Code.py’: ‘Stanley’, ‘Output.txt’: ‘Al bert’,‘btech.txt’ : ‘Albert’} the groupAndSortOwners function should return {‘Albert’: [‘btech.txt’, ‘Input.txt’, ‘Output.txt’], ‘Stan’: [‘Code.py’]}. 
+[3]: from collections import defaultdict 
+def groupAndSortOwners(input_dict: dict[str, str]) -> dict[str, list[str]]: result_dict: defaultdict[str, list[str]] = defaultdict(list) 
+for file, owner in input_dict.items(): 
+result_dict[owner].append(file) 
+return {owner: sorted(files) for owner, files in result_dict.items()} 
+files = { 
+'Input.txt': 'Albert', 
+'Code.py': 'Stanley', 
+'Output.txt': 'Albert', 
+'btech.txt': 'Albert' 
+} 
+print(groupAndSortOwners(files)) 
+{'Albert': ['Input.txt', 'Output.txt', 'btech.txt'], 'Stanley': ['Code.py']} 1
+
+JVP 7 
+1 Aim 
+To write a Python program that prints a specific pattern based on user input for the number of rows. 
+2 Code 
+def print_pattern(rows): 
+num = rows * (rows + 1) - 1 # Starting number 
+for i in range(rows): 
+print(" " * (3 * i), end="") # Adjust spacing 
+for j in range(rows - i): 
+print(num, end=" ") 
+num -= 2 
+print() 
+# Input number of rows 
+rows = int(input("Enter number of rows: ")) 
+print_pattern(rows) 
+3 Output 
+
+1
+JVP Lab 8 
+1 Aim 
+To develop a Python program that finds the roots of a quadratic equation using the quadratic formula. 
+2 Introduction 
+A quadratic equation takes the form: 
+ax2 + bx + c = 0 (1) 
+where a, b, and c are coefficients. 
+The roots of a quadratic equation are found using the quadratic formula: x =−b ±√b2 − 4ac 
+2a(2) 
+3 Code 
+The following Python code implements a solver for quadratic equations: import math 
+class QuadraticEquationSolver: 
+@staticmethod 
+def findRoots(a, b, c): 
+if a == 0: 
+raise ValueError("Coefficient 'a' 
+cannot be zero for a quadratic equation.") 
+discriminant = b**2 - 4*a*c 
+if discriminant < 0: 
+return "No real roots" 
+sqrt_discriminant = math.sqrt(discriminant) 
+root1 = (-b + sqrt_discriminant) / (2 * a) 
+root2 = (-b - sqrt_discriminant) / (2 * a) 
+1
+return root1, root2 
+solver = QuadraticEquationSolver() 
+roots = solver.findRoots(2, -5, -3) 
+print("Roots:", roots) 
+4 Output
+
+JVP Lab 9 
+Aim: 
+This program demonstrates the use of: 
+• Classes and Objects 
+• Inheritance 
+• Method Overloading 
+• Method Overriding 
+Java Code 
+1 class Vehicle { 
+2 String brand ; 
+3 
+4 Vehicle ( String brand ) { 
+5 this . brand = brand ; 
+6 } 
+7 
+8 void start () { 
+9 System . out . println ( brand + " vehicle is starting ...") ; 10 } 
+11 
+12 void displayInfo () { 
+13 System . out . println (" Brand : " + brand ) ; 
+14 } 
+15 } 
+16 
+17 class Car extends Vehicle { 
+18 String model ; 
+19 
+20 Car ( String brand , String model ) { 
+21 super ( brand ) ; 
+22 this . model = model ; 
+23 } 
+24 
+25 @Override 
+26 void start () { 
+27 System . out . println ( brand + " " + model + " car is starting with keyless ignition .") ; 
+1
+28 } 
+29 
+30 void drive () { 
+31 System . out . println (" Driving at a normal speed .") ; 32 } 
+33 
+34 void drive (int speed ) { 
+35 System . out . println (" Driving at " + speed + " km/h.") ; 36 } 
+37 } 
+38 
+39 public class Main { 
+40 public static void main ( String [] args ) { 
+41 Vehicle myVehicle = new Vehicle (" Toyota ") ; 42 myVehicle . start () ; 
+43 myVehicle . displayInfo () ; 
+44 
+45 System . out . println (" -----") ; 
+46 
+47 Car myCar = new Car (" Honda ", " Civic ") ; 
+48 myCar . start () ; // Overridden method 49 myCar . drive () ; // Overloaded method 50 myCar . drive (80) ; // Overloaded method with parameter 51 myCar . displayInfo () ; // Inherited method 52 } 
+53 } 
+Listing 1: Java Example with Inheritance and Overloading 
+Expected Output 
+Console Output 
+Toyota vehicle is starting... 
+Brand: Toyota 
+—– 
+Honda Civic car is starting with keyless ignition. 
+Driving at a normal speed. 
+Driving at 80 km/h. 
+Brand: Honda
+Screenshot of Output
+
+JVP Lab 10 
+Aim 
+Design a program for exception handling, multithreading and database operations. Code 
+import sqlite3 
+import threading 
+# Database setup 
+DB_NAME = " example .db" 
+def create_table () : 
+""" Creates a table if it does not exist .""" 
+try: 
+conn = sqlite3 . connect ( DB_NAME ) 
+cursor = conn . cursor () 
+cursor . execute ( ’’’ CREATE TABLE IF NOT EXISTS users ( id INTEGER PRIMARY KEY AUTOINCREMENT , 
+name TEXT NOT NULL , 
+age INTEGER NOT NULL ) ’’’) 
+conn . commit () 
+print (" Table is ready .") 
+except sqlite3 . Error as e : 
+print ( f" Database error : {e}") 
+finally : 
+conn . close () 
+def insert_user ( name , age ) : 
+""" Inserts a user into the database .""" 
+try: 
+conn = sqlite3 . connect ( DB_NAME ) 
+cursor = conn . cursor () 
+cursor . execute (" INSERT INTO users (name , age ) VALUES (? , ,→ ?)", ( name , age ) ) 
+conn . commit () 
+print ( f" Inserted user : { name } , Age: {age}") 
+except sqlite3 . Error as e : 
+print ( f" Error inserting user : {e}") 
+finally : 
+1
+conn . close () 
+def fetch_users () : 
+""" Fetches all users from the database .""" 
+try: 
+conn = sqlite3 . connect ( DB_NAME ) 
+cursor = conn . cursor () 
+cursor . execute (" SELECT * FROM users ") 
+users = cursor . fetchall () 
+print ("\ nUsers in Database :") 
+for user in users : 
+print ( user ) 
+except sqlite3 . Error as e : 
+print ( f" Error fetching users : {e}") 
+finally : 
+conn . close () 
+# Multithreading functions 
+def insert_users_threaded () : 
+""" Inserts multiple users using threads .""" 
+users = [(" Tanya ", 22) , (" Zeal ", 21) , (" Tanvi ", 22) ] threads = [] 
+for user in users : 
+thread = threading . Thread ( target = insert_user , args = user ) threads . append ( thread ) 
+thread . start () 
+for thread in threads : 
+thread . join () 
+def fetch_users_threaded () : 
+""" Fetch users using a separate thread .""" 
+thread = threading . Thread ( target = fetch_users ) 
+thread . start () 
+thread . join () 
+# Main execution 
+if __name__ == " __main__ ": 
+create_table () 
+print ("\ nInserting users with multithreading ...") insert_users_threaded () 
+print ("\ nFetching users with multithreading ...") 
+fetch_users_threaded ()
+Output 
+Table is ready. 
+Inserting users with multithreading... Inserted user: Tanya, Age: 22 Inserted user: Tanvi, Age: 22 Inserted user: Zeal, Age: 21 
+Fetching users with multithreading... 
+Users in Database: (1, ’Alice’, 25) (2, ’Charlie’, 22) (3, ’Bob’, 30) (4, ’Tanya’, 22) (5, ’Tanvi’, 22) (6, ’Zeal’, 21) 
+Screenshot of Output:
+
+JVP 11 
+1 Introduction 
+Remote Procedure Call (RPC) allows a client to execute functions on a remote server. This project uses Python’s xmlrpc library to allow a client to read from and write to files located on a server. 
+2 Technologies Used 
+• Python 3.x 
+• xmlrpc.server for server-side implementation 
+• xmlrpc.client for client-side calls 
+• Basic file I/O operations 
+3 Server Code (server.py) 
+from xmlrpc.server import SimpleXMLRPCServer 
+import os 
+class FileService: 
+def read_file(self, filename): 
+if not os.path.exists(filename): 
+return f"Error: {filename} does not exist." 
+with open(filename, 'r') as file: 
+return file.read() 
+def write_file(self, filename, content): 
+with open(filename, 'w') as file: 
+file.write(content) 
+return f"{filename} written successfully." 
+server = SimpleXMLRPCServer(("localhost", 8000), allow_none=True) print("RPC Server is running on port 8000...") 
+file_service = FileService() 
+server.register_instance(file_service) 
+server.serve_forever() 
+4 Client Code (client.py) 
+1
+
+import xmlrpc.client 
+proxy = xmlrpc.client.ServerProxy("http://localhost:8000/", allow_none=True) 
+filename = "sample.txt" 
+write_response = proxy.write_file(filename, "Hello from RPC Client!") print("Write Response:", write_response) 
+read_response = proxy.read_file(filename) 
+print("Read Response:", read_response) 
+5 Execution Steps 
+1. Open terminal and run the server script: 
+python server.py 
+2. Open a new terminal and run the client script: 
+python client.py 
+6 Output 
+7 Conclusion 
+This simple RPC implementation in Python demonstrates how a client can interact with files on a server remotely. It’s a foundational step toward building distributed systems and networked applications.
+
+JVP Lab 12 
+Aim 
+Build a concurrent multithreaded file transfer server using threads. Code 
+FileTransferServer.java 
+import java . io .*; 
+import java . net .*; 
+public class FileTransferServer { 
+public static void main ( String [] args ) { 
+int port = 8888; 
+try ( ServerSocket serverSocket = new ServerSocket ( port ) ) { System . out . println ( " Server started on port " + port ) ; 
+while ( true ) { 
+Socket clientSocket = serverSocket . accept () ; 
+System . out . println ( " Client connected : " + clientSocket . getInetAddress () . getHostAddress () ) ; 
+Thread clientThread = new Thread ( new ClientHandler ( 
+clientSocket ) ) ; 
+clientThread . start () ; 
+} 
+} catch ( IOException e ) { 
+System . out . println ( " Error : " + e . getMessage () ) ; 
+} 
+} 
+} 
+class ClientHandler implements Runnable { 
+private Socket clientSocket ; 
+public ClientHandler ( Socket socket ) { 
+this . clientSocket = socket ; 
+} 
+1
+public void run () { 
+try { 
+BufferedReader in = new BufferedReader ( new InputStreamReader ( clientSocket . getInputStream () ) ) ; 
+String fileName = in . readLine () ; 
+File file = new File ( fileName ) ; 
+FileInputStream fileInputStream = new FileInputStream ( file ) ; OutputStream out = clientSocket . getOutputStream () ; 
+byte [] buffer = new byte [8192]; 
+int bytesRead ; 
+while (( bytesRead = fileInputStream . read ( buffer ) ) != -1) { out . write ( buffer , 0 , bytesRead ) ; 
+} 
+fileInputStream . close () ; 
+out . close () ; 
+clientSocket . close () ; 
+System . out . println ( " File transferred successfully to client : " + clientSocket . getInetAddress () . getHostAddress () ) ; 
+} catch ( IOException e ) { 
+System . out . println ( " Error handling client request : " + e . getMessage () ) ; 
+} 
+} 
+} 
+FileTransferClient.java 
+import java . io .*; 
+import java . net .*; 
+public class FileTransferClient { 
+public static void main ( String [] args ) { 
+String serverAddress = " localhost " ; 
+int serverPort = 8888; 
+String fileName = " C :\\ Users \\ morem \\ OneDrive \\ Desktop \\ MCA_Sem2 \\ Java & Python \\ Java \\ Prac_9 \\ MyFile . txt " ; 
+try ( Socket socket = new Socket ( serverAddress , serverPort ) ) { PrintWriter out = new PrintWriter ( socket . getOutputStream () , true ) ; 
+out . println ( fileName ) ; 
+InputStream in = socket . getInputStream () ; 
+FileOutputStream fileOutputStream = new FileOutputStream ( " D :\\ Target_Destination " ) ; 
+byte [] buffer = new byte [8192]; 
+int bytesRead ;
+while (( bytesRead = in . read ( buffer ) ) != -1) { 
+fileOutputStream . write ( buffer , 0 , bytesRead ) ; 
+} 
+fileOutputStream . close () ; 
+in . close () ; 
+socket . close () ; 
+System . out . println ( " File received successfully " ) ; 
+} catch ( IOException e ) { 
+System . out . println ( " Error : " + e . getMessage () ) ; 
+} 
+} 
+} 
+Output 
+Below is the output showing a successful file transfer between the server and client. 
+Conclusion 
+In this lab, we developed a concurrent multithreaded file transfer server using Java threads. Each client connection was handled in a separate thread, allowing multiple clients to request files concurrently without blocking each other.
+JVP Lab 13 
+Aim : Implement the following problems using Map Reduce in Java/Python. Problem 1: Calculate the average rating for each product from a dataset of product reviews. 
+Sample input: 
+p1,4.5 
+p2,3.0 
+p1,5.0 
+p2,2.5 
+p3,4.0 
+Sample Output: 
+"p1" 4.75 
+"p2" 2.75 
+"p3" 4.0 
+Code:- 
+1 import java . util .*; 
+2 
+3 public class Problem1_AverageRating { 
+4 
+5 public static void main ( String [] args ) { 
+6 // Sample input 
+7 String [] input = { 
+8 "p1 ,4.5 ", 
+9 "p2 ,3.0 ", 
+10 "p1 ,5.0 ", 
+11 "p2 ,2.5 ", 
+12 "p3 ,4.0 " 
+13 }; 
+14 
+15 // Map step : product -> list of ratings 
+16 Map < String , List < Double >> map = new HashMap < >() ; 
+17 
+18 for ( String line : input ) { 
+19 String [] parts = line . split (","); 
+20 String product = parts [0]; 
+21 double rating = Double . parseDouble ( parts [1]) ; 
+22 
+23 map . computeIfAbsent ( product , k -> new ArrayList < >() ). add ( rating ); 24 } 
+25 
+26 // Reduce step : calculate average 
+27 Map < String , Double > averageRatings = new HashMap < >() ; 
+28 
+29 for ( Map . Entry < String , List < Double > > entry : map . entrySet () ) { 30 List < Double > ratings = entry . getValue () ; 
+31 double sum = 0; 
+32 for ( double r : ratings ) { 
+33 sum += r; 
+1
+34 } 
+35 averageRatings . put ( entry . getKey () , sum / ratings . size () ); 
+36 } 
+37 
+38 // Output 
+39 for ( Map . Entry < String , Double > entry : averageRatings . entrySet () ) { 40 System . out . println ("\"" + entry . getKey () + "\" " + entry . getValue () ); 41 } 
+42 } 
+43 } 
+Output:- 
+
+Problem 2: Given a social network dataset, find all mutual friends between pairs of users. 
+Sample input: 
+user1:user2,user3,user4 
+user2:user1,user3,user5 
+user3:user1,user2,user4,user5 
+user4:user1,user3 
+user5:user2,user3 
+Sample Output: 
+("user1", ["user2", "user3", "user4"]) 
+("user2", ["user1", "user3", "user5"]) 
+("user3", ["user1", "user2", "user4", "user5"]) 
+("user4", ["user1", "user3"]) 
+("user5", ["user2", "user3"]) 
+(("user2", "user3"), ["user1", "user5"]) 
+(("user1", "user3"), ["user2", "user4"]) 
+(("user1", "user4"), ["user3"]) 
+(("user3", "user5"), ["user2"]) 
+Code:- 
+1 import java . util .*; 
+2 
+3 public class Problem2_MutualFriends { 
+4 
+5 public static void main ( String [] args ) { 
+6 // Sample input 
+7 String [] input = { 
+8 " user1 :user2 ,user3 , user4 ", 
+9 " user2 :user1 ,user3 , user5 ", 
+10 " user3 :user1 ,user2 ,user4 , user5 ", 
+11 " user4 :user1 , user3 ", 
+12 " user5 :user2 , user3 " 
+13 }; 
+14 
+15 // Step 1: Build user -> friends map 
+16 Map < String , Set < String > > userFriends = new HashMap < >() ; 
+17
+18 for ( String line : input ) { 
+19 String [] parts = line . split (":"); 
+20 String user = parts [0]; 
+21 Set < String > friends = new HashSet < >( Arrays . asList ( parts [1]. split (",")) ); 22 userFriends . put ( user , friends ); 
+23 } 
+24 
+25 // Step 2: Find mutual friends between all user pairs 
+26 Set < String > seenPairs = new HashSet < >() ; 
+27 
+28 for ( String user1 : userFriends . keySet () ) { 
+29 for ( String user2 : userFriends . keySet () ) { 
+30 if (! user1 . equals ( user2 )) { 
+31 String pairKey = user1 . compareTo ( user2 ) < 0 ? user1 + "," + user2 : user2 + "," + user1 ; 
+32 if (! seenPairs . contains ( pairKey ) ) { 
+33 Set < String > friends1 = userFriends . get ( user1 ); 
+34 Set < String > friends2 = userFriends . get ( user2 ); 
+35 
+36 Set < String > mutual = new HashSet < >( friends1 ); 
+37 mutual . retainAll ( friends2 ) ; 
+38 
+39 if (! mutual . isEmpty () ) { 
+40 System . out . println (" (\" " + user1 + "\" , \"" + user2 + " \") Mutual Friends : " + mutual ); 
+41 } 
+42 seenPairs . add ( pairKey ); 
+43 } 
+44 } 
+45 } 
+46 } 
+47 } 
+48 } 
+Output:- 
+
+Problem 3: Multiply two large matrices using MapReduce. 
+Sample input: 
+a 0 0 1 
+a 0 1 2 
+a 1 0 3 
+a 1 1 4 
+b 0 0 5 
+b 0 1 6 
+b 1 0 7
+b 1 1 8 
+Sample Output: 
+((0, 0), 19.0) 
+((0, 1), 22.0) 
+((1, 0), 43.0) 
+((1, 1), 50.0) 
+Code:- 
+1 import java . util .*; 
+2 
+3 public class Problem3_MatrixMultiply { 
+4 
+5 public static void main ( String [] args ) { 
+6 // Sample input 
+7 String [] input = { 
+8 "a 0 0 1", 
+9 "a 0 1 2", 
+10 "a 1 0 3", 
+11 "a 1 1 4", 
+12 "b 0 0 5", 
+13 "b 0 1 6", 
+14 "b 1 0 7", 
+15 "b 1 1 8" 
+16 }; 
+17 
+18 Map < String , Double > aMatrix = new HashMap < >() ; 
+19 Map < String , Double > bMatrix = new HashMap < >() ; 
+20 int size = 2; // 2x2 matrices 
+21 
+22 for ( String line : input ) { 
+23 String [] parts = line . split (" "); 
+24 String matrix = parts [0]; 
+25 int row = Integer . parseInt ( parts [1]) ; 
+26 int col = Integer . parseInt ( parts [2]) ; 
+27 double val = Double . parseDouble ( parts [3]) ; 
+28 
+29 if ( matrix . equals ("a")) { 
+30 aMatrix . put ( row + "," + col , val ) ; 
+31 } else if ( matrix . equals ("b")) { 
+32 bMatrix . put ( row + "," + col , val ) ; 
+33 } 
+34 } 
+35 
+36 // Multiply 
+37 Map < String , Double > result = new HashMap < >() ; 
+38 
+39 for (int i = 0; i < size ; i ++) { // rows of A 
+40 for (int j = 0; j < size ; j ++) { // columns of B 41 double sum = 0; 
+42 for (int k = 0; k < size ; k ++) { 
+43 double aVal = aMatrix . getOrDefault (i + "," + k , 0.0) ; 44 double bVal = bMatrix . getOrDefault (k + "," + j , 0.0) ; 45 sum += aVal * bVal ; 
+46 } 
+47 result . put ("(" + i + "," + j + ")", sum ); 48 } 
+49 } 
+50 
+51 // Output 
+52 for ( Map . Entry < String , Double > entry : result . entrySet () ) { 53 System . out . println ( entry . getKey () + " " + entry . getValue () ); 54 } 
+55 } 
+56 }
+Output:- 
+
+Problem 4: Find the top N most frequent words in a document. 
+Sample input: 
+hello world hello mapreduce 
+hello again world 
+world of mapreduce 
+goodbye world 
+Sample Output: 
+"world" 4 
+"hello" 3 
+"mapreduce" 2 
+"again" 1 
+"goodbye" 1 
+Code:- 
+1 import java . util .*; 
+2 
+3 public class Problem4_TopNWords { 
+4 
+5 public static void main ( String [] args ) { 
+6 // Sample input 
+7 String [] input = { 
+8 " hello world hello mapreduce ", 
+9 " hello again world ", 
+10 " world of mapreduce ", 
+11 " goodbye world " 
+12 }; 
+13 
+14 Map < String , Integer > wordCount = new HashMap < >() ; 
+15 
+16 for ( String line : input ) { 
+17 String [] words = line . split ("\\s+"); 
+18 for ( String word : words ) { 
+19 wordCount . put ( word , wordCount . getOrDefault ( word , 0) + 1) ; 
+20 } 
+21 } 
+22 
+23 // Sort by frequency 
+24 List < Map . Entry < String , Integer >> list = new ArrayList < >( wordCount . entrySet () ); 25 list . sort ((a , b ) -> b. getValue () . compareTo (a. getValue () )); 
+26 
+27 // Output all 
+28 for ( Map . Entry < String , Integer > entry : list ) { 
+29 System . out . println ("\"" + entry . getKey () + "\" " + entry . getValue () ); 30 } 
+31 } 
+32 }
+Output:- 
+
+Problem 5: Create an inverted index that maps words to the documents that contain them. 
+Sample input: 
+doc1:hello world hello mapreduce 
+doc2:goodbye world 
+doc3:hello again 
+Sample Output: 
+"again" ["doc3"] 
+"goodbye" ["doc2"] 
+"hello" ["doc1", "doc3"] 
+"mapreduce" ["doc1"] 
+"world" ["doc1", "doc2"] 
+Code:- 
+1 import java . util .*; 
+2 
+3 public class Problem5_InvertedIndexSimple { 
+4 
+5 public static void main ( String [] args ) { 
+6 // Sample input 
+7 String [] input = { 
+8 " doc1 : hello world hello mapreduce ", 
+9 " doc2 : goodbye world ", 
+10 " doc3 : hello again " 
+11 }; 
+12 
+13 Map < String , Set < String > > invertedIndex = new HashMap < >() ; 
+14 
+15 for ( String line : input ) { 
+16 String [] parts = line . split (":"); 
+17 String docId = parts [0]; 
+18 String [] words = parts [1]. split ("\\s+"); 
+19 
+20 for ( String word : words ) { 
+21 invertedIndex . computeIfAbsent ( word , k -> new HashSet < >() ). add ( docId ); 22 } 
+23 } 
+24 
+25 // Output 
+26 for ( Map . Entry < String , Set < String >> entry : invertedIndex . entrySet () ) { 27 System . out . println ("\"" + entry . getKey () + "\" " + entry . getValue () ); 28 } 
+29 } 
+30 }
+Output:- 
+—End of Practical—
+JVP Lab 14 
+Aim 
+Implementation of concurrent chat server that allows current logged in users to commu nicate one with other. 
+ChatServer.java 
+1 import java . io .*; 
+2 import java . net .*; 
+3 import java . util .*; 
+4 
+5 public class ChatServer { 
+6 private static Set < PrintWriter > clientWriters = new HashSet < >() ; 7 
+8 public static void main ( String [] args ) { 
+9 System . out . println (" Chat server started ... ") ; 
+10 try ( ServerSocket serverSocket = new ServerSocket (1234) ) { 11 while ( true ) { 
+12 Socket clientSocket = serverSocket . accept () ; 13 System . out . println ("New client connected .") ; 14 PrintWriter writer = new PrintWriter ( clientSocket . getOutputStream () , true ) ; 
+15 clientWriters . add ( writer ) ; 
+16 
+17 Thread clientThread = new Thread (() -> handleClient ( clientSocket , writer ) ) ; 
+18 clientThread . start () ; 
+19 } 
+20 } catch ( IOException e ) { 
+21 e . printStackTrace () ; 
+22 } 
+23 } 
+24 
+25 private static void handleClient ( Socket clientSocket , PrintWriter writer ) { 
+26 try ( 
+27 BufferedReader reader = new BufferedReader (new InputStreamReader ( clientSocket . getInputStream () ) ) 
+28 ) { 
+29 String message ; 
+30 while (( message = reader . readLine () ) != null ) { 31 System . out . println (" Received : " + message ) ; 32 for ( PrintWriter w : clientWriters ) { 
+33 w . println (" Client : " + message ) ; 
+34 } 
+1
+35 } 
+36 } catch ( IOException e ) { 
+37 e . printStackTrace () ; 
+38 } finally { 
+39 clientWriters . remove ( writer ) ; 
+40 try { 
+41 clientSocket . close () ; 
+42 } catch ( IOException e ) { 
+43 e . printStackTrace () ; 
+44 } 
+45 } 
+46 } 
+47 } 
+Listing 1: ChatServer.java 
+ChatClient.java 
+1 import java . io .*; 
+2 import java . net .*; 
+3 import java . util . Scanner ; 
+4 
+5 public class ChatClient { 
+6 private Socket clientSocket ; 
+7 private PrintWriter out ; 
+8 private BufferedReader in ; 
+9 
+10 public void start ( String serverAddress , int serverPort ) { 11 try { 
+12 clientSocket = new Socket ( serverAddress , serverPort ) ; 13 out = new PrintWriter ( clientSocket . getOutputStream () , true ) ; 
+14 in = new BufferedReader (new InputStreamReader ( clientSocket . getInputStream () ) ) ; 
+15 
+16 System . out . println (" Connected to chat server . Start typing your messages !") ; 
+17 
+18 // Listener thread 
+19 Thread messageListenerThread = new Thread (() -> { 20 try { 
+21 String serverMessage ; 
+22 while (( serverMessage = in . readLine () ) != null ) { 23 System . out . println ( serverMessage ) ; 24 } 
+25 } catch ( IOException e ) { 
+26 e . printStackTrace () ; 
+27 } 
+28 }) ; 
+29 messageListenerThread . start () ; 
+30 
+31 Scanner scanner = new Scanner ( System . in ) ; 32 String userInput ; 
+33 while (!( userInput = scanner . nextLine () ) . equals (" quit ") ) { 34 out . println ( userInput ) ; 
+35 }
+36 
+37 out . close () ; 
+38 in . close () ; 
+39 clientSocket . close () ; 
+40 } catch ( IOException e ) { 
+41 e . printStackTrace () ; 
+42 } 
+43 } 
+44 
+45 public static void main ( String [] args ) { 46 ChatClient client = new ChatClient () ; 47 client . start (" localhost ", 1234) ; 48 } 
+49 } 
+Listing 2: ChatClient.java 
+Sample Output 
+Server Console 
+Chat server started... 
+New client connected. 
+Received: Hello 
+Received: How are you? 
+Client Console 
+Connected to chat server. Start typing your messages! Hello 
+Client: Hello 
+How are you? 
+Client: How are you?
+Screenshots 
+Client Output 
+Figure 1: Chat Client Console Output 
+Server Output 
+Figure 2: Chat Server Console Output
