@@ -12,12 +12,11 @@ class ParallelSearch{
     public static void main(String args[]){
         File dir = new File("");
         if(dir.exists() && dir.isDirectory()){
-
+            
         }
         else {
             Log.log("Invalid Directory Path");
-        }
-    
+        }    
     }
 }
 
